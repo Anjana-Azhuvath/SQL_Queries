@@ -1,0 +1,65 @@
+/*
+-- Marketing team Queries
+*/
+
+-- WHAT IS THE NAME OF THE CHEAPEST PRODUCT THEY SELL?
+SELECT
+[Stock Item] as ProductName,
+[Unit Price]
+FROM dimStockItem
+
+--WHAT IS THE CHEAPEST NON-PACKAGING RELATED PRODUCT
+
+SELECT
+[Stock Item] as ProductName,
+[Unit Price]
+FROM dimStockItem
+WHERE [Unit Price] = (SELECT MIN ([Unit Price]) FROM dimStockItem WHERE [Stock Item Key] !=0)
+
+-- Find a list of products that have the word Mug or Shirt in their name?
+SELECT 
+    [Stock Item] as pd, 
+    [UNIT PRICE]
+FROM dimStockItem
+WHERE [Stock Item] LIKE '%mug%'  OR [Stock Item] LIKE '%shirt%' 
+
+-- How many of the products are black?
+SELECT 
+    [Stock Item] as pd, 
+    [UNIT PRICE]
+FROM dimStockItem
+WHERE [Stock Item] LIKE '%mug%'  OR [Stock Item] LIKE '%shirt%' AND [Color]='Black'
+
+-- What is the stock id of the cheapest product meeting the above two requirements?
+SELECT 
+    [WWI Stock Item ID],
+    [Stock Item] as pd, 
+    [UNIT PRICE]
+FROM dimStockItem
+WHERE [Stock Item] LIKE '%mug%'  OR [Stock Item] LIKE '%shirt%' AND [Color]='Black' 
+ORDER BY [Unit Price] ASC
+
+-- WHAT IS THE MARK-UP ON STOCK ID 29?
+SELECT
+    [WWI Stock Item ID],
+    [Unit Price],
+    [Recommended Retail Price],
+    ([Recommended Retail Price] - [Unit Price]) / [Unit Price] as PctMarkUp
+FROM dimStockItem
+Where [WWI Stock Item ID] =29
+
+/*
+Delivery Team:
+*/
+
+-- Do any postocdes have more than 3 Wing tip toy shops? If so, which Post code?
+SELECT
+    Customer,
+    [Postal Code]
+FROM dimCustomer
+WHERE [Postal Code] IN (SELECT
+                            [Postal Code]
+                        FROM dimCustomer
+                        WHERE [Buying Group]='Wingtip Toys'
+                        GROUP BY [Postal Code]
+                        HAVING COUNT ([Customer Key])>3)
