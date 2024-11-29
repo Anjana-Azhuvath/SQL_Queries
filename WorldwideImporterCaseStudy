@@ -63,3 +63,33 @@ WHERE [Postal Code] IN (SELECT
                         WHERE [Buying Group]='Wingtip Toys'
                         GROUP BY [Postal Code]
                         HAVING COUNT ([Customer Key])>3)
+
+-- Sales Team Queries:
+SELECT
+    d.[Fiscal Year],
+    d.[Fiscal Month Label] ,
+    d.[Fiscal Month Number],
+    SUM(s.[Total Excluding Tax])
+FROM factSale AS s
+    INNER JOIN dimDate as d 
+    ON s.[Invoice Date Key]=d.[Date]
+GROUP BY d.[Fiscal Month Label], d.[Fiscal Month Number],d.[Fiscal Year]
+ORDER BY d.[Fiscal Month Number],d.[Fiscal Year]
+
+--WHAT WAS THE TOP PERFORMING PRODUCT/SALESPERSON COMBINATION IN 2016?
+SELECT TOP 10
+    p.[Stock Item],
+    SUM(s.[Total Excluding Tax]),
+    e.[Preferred Name]
+FROM  factSale AS s 
+
+INNER JOIN dimStockItem as p
+ON s.[Stock Item Key]=p.[Stock Item Key]
+INNER JOIN dimDate as d 
+ON s.[Invoice Date Key]=d.[Date]
+INNER JOIN dimEmployee as e 
+ON e.[Employee Key]=s.[Salesperson Key]
+
+
+WHERE d.[Fiscal Year]=2016
+GROUP BY p.[Stock Item], e.[Preferred Name]
